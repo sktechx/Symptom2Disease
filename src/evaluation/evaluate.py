@@ -1,27 +1,25 @@
-import json
 import os
+import json
 
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 from sklearn.metrics import (
     accuracy_score,
     classification_report,
-    confusion_matrix
+    confusion_matrix,
+    ConfusionMatrixDisplay
 )
 
+
+# ============================================================
+# EVALUATE MODEL
+# ============================================================
 
 def evaluate_model(
     model,
     X_test,
     y_test
 ):
-    """
-    Evaluate model using:
-    Accuracy
-    Classification Report
-    Confusion Matrix
-    """
 
     predictions = model.predict(
         X_test
@@ -35,6 +33,7 @@ def evaluate_model(
     report = classification_report(
         y_test,
         predictions,
+        output_dict=True,
         zero_division=0
     )
 
@@ -43,20 +42,17 @@ def evaluate_model(
         predictions
     )
 
-    print("=" * 60)
-    print("MODEL EVALUATION")
-    print("=" * 60)
-
     print(
-        f"\nAccuracy: "
-        f"{accuracy:.4f}"
+        "\nClassification Report:"
     )
 
     print(
-        "\nClassification Report:\n"
+        classification_report(
+            y_test,
+            predictions,
+            zero_division=0
+        )
     )
-
-    print(report)
 
     return (
         accuracy,
@@ -66,83 +62,67 @@ def evaluate_model(
     )
 
 
+# ============================================================
+# SAVE CONFUSION MATRIX
+# ============================================================
+
 def save_confusion_matrix(
     cm,
     labels,
-    output_path
+    path
 ):
-    """
-    Save confusion matrix as PNG.
-    """
 
     os.makedirs(
-        os.path.dirname(output_path),
+        os.path.dirname(path),
         exist_ok=True
     )
 
-    plt.figure(
-        figsize=(14, 10)
+    fig, ax = plt.subplots(
+        figsize=(14, 12)
     )
 
-    sns.heatmap(
-        cm,
-        annot=True,
-        fmt="d",
-        xticklabels=labels,
-        yticklabels=labels
+    display = ConfusionMatrixDisplay(
+        confusion_matrix=cm,
+        display_labels=labels
     )
 
-    plt.xlabel(
-        "Predicted Label"
-    )
-
-    plt.ylabel(
-        "True Label"
-    )
-
-    plt.title(
-        "Confusion Matrix"
-    )
-
-    plt.xticks(
-        rotation=90
-    )
-
-    plt.yticks(
-        rotation=0
+    display.plot(
+        ax=ax,
+        xticks_rotation=90,
+        colorbar=False
     )
 
     plt.tight_layout()
 
     plt.savefig(
-        output_path,
-        dpi=300
+        path,
+        dpi=200
     )
 
     plt.close()
 
 
+# ============================================================
+# SAVE RESULTS
+# ============================================================
+
 def save_model_results(
     results,
-    output_path
+    path
 ):
-    """
-    Save model comparison results
-    as JSON.
-    """
 
     os.makedirs(
-        os.path.dirname(output_path),
+        os.path.dirname(path),
         exist_ok=True
     )
 
     with open(
-        output_path,
+        path,
         "w"
-    ) as file:
+    ) as f:
 
         json.dump(
             results,
-            file,
+            f,
             indent=4
         )

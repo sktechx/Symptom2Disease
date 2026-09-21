@@ -1,36 +1,44 @@
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
-def create_tfidf_vectorizer():
-    """
-    Create TF-IDF vectorizer.
-    """
+# ============================================================
+# CREATE TF-IDF
+# ============================================================
 
-    tfidf = TfidfVectorizer(
+def create_tfidf_vectorizer():
+
+    vectorizer = TfidfVectorizer(
+
+        max_features=5000,
+
         ngram_range=(1, 2),
-        min_df=1,
+
+        min_df=2,
+
         max_df=0.95,
+
         sublinear_tf=True
     )
 
-    return tfidf
+    return vectorizer
 
+
+# ============================================================
+# FIT + TRANSFORM
+# ============================================================
 
 def fit_tfidf(
-    tfidf,
+    vectorizer,
     X_train,
     X_test
 ):
-    """
-    Fit TF-IDF only on training data
-    and transform both train and test data.
-    """
 
-    X_train_tfidf = tfidf.fit_transform(
+    X_train_tfidf = vectorizer.fit_transform(
         X_train
     )
 
-    X_test_tfidf = tfidf.transform(
+    X_test_tfidf = vectorizer.transform(
         X_test
     )
 

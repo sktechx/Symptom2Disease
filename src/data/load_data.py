@@ -1,38 +1,24 @@
 import pandas as pd
 
 
-def load_dataset(file_path):
-    """
-    Load the Symptom2Disease dataset.
+def load_dataset(path):
 
-    Parameters:
-        file_path (str): Path to CSV file.
+    print(
+        f"\nLoading dataset from: {path}"
+    )
 
-    Returns:
-        pd.DataFrame: Loaded dataset.
-    """
+    df = pd.read_csv(path)
 
-    try:
-        df = pd.read_csv(file_path)
+    print(
+        f"Dataset shape: {df.shape}"
+    )
 
-        print(f"Dataset loaded successfully.")
-        print(f"Shape: {df.shape}")
+    print(
+        "\nColumns:"
+    )
 
-        return df
+    print(
+        df.columns.tolist()
+    )
 
-    except FileNotFoundError:
-        print(f"Error: Dataset not found at {file_path}")
-        raise
-
-    except Exception as e:
-        print(f"Error while loading dataset: {e}")
-        raise
-
-
-if __name__ == "__main__":
-
-    path = "data/raw/Symptom2Disease.csv"
-
-    df = load_dataset(path)
-
-    print(df.head())
+    return df

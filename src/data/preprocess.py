@@ -2,27 +2,26 @@ import re
 import pandas as pd
 
 
+# ============================================================
+# TEXT PREPROCESSING
+# ============================================================
+
 def preprocess_text(text):
-    """
-    Clean input text.
 
-    Steps:
-    1. Convert to lowercase
-    2. Remove special characters and numbers
-    3. Remove extra spaces
-    """
+    if pd.isna(text):
 
-    if not isinstance(text, str):
         return ""
 
-    text = text.lower()
+    text = str(text).lower()
 
+    # Remove special characters
     text = re.sub(
         r"[^a-zA-Z\s]",
         " ",
         text
     )
 
+    # Remove extra spaces
     text = re.sub(
         r"\s+",
         " ",
@@ -32,65 +31,35 @@ def preprocess_text(text):
     return text
 
 
+# ============================================================
+# DATAFRAME PREPROCESSING
+# ============================================================
+
 def preprocess_dataframe(df):
-    """
-    Clean the dataset.
-
-    Required columns:
-        text
-        label
-
-    Returns:
-        Cleaned DataFrame
-    """
 
     df = df.copy()
 
-    # Remove unnecessary unnamed columns
-    unnamed_columns = [
-        col for col in df.columns
-        if col.lower().startswith("unnamed")
-    ]
+    # Make sure required columns exist
+    if "text" not in df.columns:
 
-    if unnamed_columns:
-        df = df.drop(
-            columns=unnamed_columns
+        raise ValueError(
+            "Dataset must contain a 'text' column."
         )
 
-    # Remove missing values
-    df = df.dropna(
-        subset=["text", "label"]
-    )
+    if "label" not in df.columns:
 
-    # Remove duplicate rows
-    df = df.drop_duplicates()
+        raise ValueError(
+            "Dataset must contain a 'label' column."
+        )
 
     # Clean text
     df["clean_text"] = df["text"].apply(
         preprocess_text
     )
 
-    # Remove empty text
+    # Remove empty rows
     df = df[
         df["clean_text"].str.len() > 0
     ]
 
     return df
-
-
-if __name__ == "__main__":
-
-    input_path = "data/raw/Symptom2Disease.csv"
-    output_path = "data/processed/cleaned_data.csv"
-
-    df = pd.read_csv(input_path)
-
-    df = preprocess_dataframe(df)
-
-    df.to_csv(
-        output_path,
-        index=False
-    )
-
-    print("Preprocessing completed.")
-    print(f"Cleaned dataset shape: {df.shape}")
